@@ -10,30 +10,36 @@ import java.util.HashMap;
 public class CityMap extends JPanel
 {
     // Borders of the map in long and lat
-    private static final double LONG_MAX = 2.362;
-    private static final double LONG_MIN = -10.728;
-    private static final double LAT_MAX = 59.468;
-    private static final double LAT_MIN = 48.86;
+    private static final double LONG_MAX = 2.2;
+    private static final double LONG_MIN = -10.762;
+    private static final double LAT_MAX = 59.1565;
+    private static final double LAT_MIN = 49.86;
 
     // Converted 2d coords
     private static double X_MAX;
     private static double X_MIN;
     private static double Y_MIN;
     private static double Y_MAX;
+
+    // Size of points
     private static final int POINT_SIZE = 4;
 
+    // Map related data
     private final Image mapImage;
     private final HashMap<String, Point2D.Double> mapCities;
+    private final HashMap<String, Point2D.Double> farCities;
 
+    // Game related data
     private int travelRadius;
     private String highlightedCity;
 
     public CityMap() throws IOException
     {
         BufferedImage rawImage = ImageIO.read(new File("uk.png"));
-        mapImage = rawImage.getScaledInstance(223, 312, Image.SCALE_SMOOTH);
+        mapImage = rawImage.getScaledInstance(350, 433, Image.SCALE_SMOOTH);
 
         mapCities = new HashMap<>();
+        farCities = new HashMap<>();
 
         travelRadius = 0;
 
@@ -43,14 +49,13 @@ public class CityMap extends JPanel
         X_MIN = getXFromLong(LONG_MIN);
     }
 
-    public void addCity(String city, Point2D.Double point)
+    public void addFarCity(String city, Point2D.Double point) throws IndexOutOfBoundsException
     {
-        addCity(city, point.x, point.y);
+        addFarCity(city, point.x, point.y);
     }
-    public void addCity(String city, double longitude, double latitude)
+    public void addFarCity(String city, double longitude, double latitude) throws IndexOutOfBoundsException
     {
         // if inbounds of map
-        System.out.println(latitude + " " + longitude);
         if (longitude >= LONG_MIN && longitude <= LONG_MAX && latitude >= LAT_MIN && latitude <= LAT_MAX)
         {
             // Convert to mercator web friendly
@@ -58,26 +63,79 @@ public class CityMap extends JPanel
             double relX = (getXFromLong(longitude) - X_MIN) / (X_MAX - X_MIN);
             double relY = (Y_MAX - getYFromLat(latitude)) / (Y_MAX - Y_MIN);
 
-            // place in points list
-            mapCities.put(city, new Point2D.Double(relX, relY));
-
-            // Make that the highlighted city
-            highlightedCity = city;
+            // place in far points list
+            farCities.put(city, new Point2D.Double(relX, relY));
 
             // Repaint list
             repaint();
         }
         else
         {
-            throw new RuntimeException("Point out of range");
+            throw new IndexOutOfBoundsException();
+        }
+    }
+    public void addCity(String city, Point2D.Double point) throws IndexOutOfBoundsException
+    {
+        addCity(city, point.x, point.y);
+    }
+    public void addCity(String city, double longitude, double latitude) throws IndexOutOfBoundsException
+    {
+        // if inbounds of map
+        System.out.println(latitude + " " + longitude);
+        if (longitude >= LONG_MIN && longitude <= LONG_MAX && latitude >= LAT_MIN && latitude <= LAT_MAX)
+        {
+            // Convert to mercator web friendly
+            // convert to relative position based from 0 to 1
+            // Place in points city
+            mapCities.put(city, new Point2D.Double(getRelativeXFromLong(longitude), getRelativeYFromLat(latitude)));
+
+            // Make that the highlighted city
+            highlightedCity = city;
+
+            // As city found, far city points can be removed
+            farCities.clear();
+
+            // Repaint list
+            repaint();
+        }
+        else
+        {
+            throw new IndexOutOfBoundsException();
         }
     }
 
-    public void setTravelRadius(int raidus)
+    public void setTravelRadius(int radius)
     {
-        travelRadius = raidus;
+        travelRadius = radius;
         repaint();
     }
+
+    public Point2D.Double getLastCityPoint()
+    {
+        return mapCities.get(highlightedCity);
+    }
+
+    public int getMapWidth()
+    {
+        return mapImage.getWidth(null);
+    }
+
+    public int getMapHeight()
+    {
+        return mapImage.getHeight(null);
+    }
+
+    public double getRelativeXFromLong(double longitude)
+    {
+        return (getXFromLong(longitude) - X_MIN) / (X_MAX - X_MIN);
+    }
+
+    public double getRelativeYFromLat(double latitude)
+    {
+        return (Y_MAX - getYFromLat(latitude)) / (Y_MAX - Y_MIN);
+    }
+
+
 
 
     @Override
@@ -86,27 +144,39 @@ public class CityMap extends JPanel
         super.paintComponent(g);
         g.drawImage(mapImage, 0, 0, null);
 
-        // Draw Points
-        for (String city : mapCities.keySet())
+        // Draw cities
+        g.setColor(Color.red);
+        drawPoints(g, farCities);
+
+        g.setColor(Color.black);
+        drawPoints(g, mapCities);
+
+        // Draw highlighted city
+        if (highlightedCity != null)
         {
-            if (city.equals(highlightedCity))
+            g.setColor(Color.gray);
+            g.fillOval((int) (mapCities.get(highlightedCity).x * mapImage.getWidth(null) - POINT_SIZE / 2 ),
+                    (int) (mapCities.get(highlightedCity).y * mapImage.getHeight(null) - POINT_SIZE / 2),
+                    POINT_SIZE, POINT_SIZE);
+
+            // Draw travel radius if highlighted city exists
+            if (travelRadius > 0)
             {
-                g.setColor(Color.magenta);
+                g.setColor(Color.gray);
+                g.drawOval((int) (mapCities.get(highlightedCity).x * mapImage.getWidth(null) - travelRadius),
+                        (int) (mapCities.get(highlightedCity).y * mapImage.getHeight(null) - travelRadius),
+                        travelRadius * 2, travelRadius * 2);
             }
-
-            g.fillOval((int) (mapCities.get(city).x * mapImage.getWidth(null) - POINT_SIZE / 2 ),
-                    (int) (mapCities.get(city).y * mapImage.getHeight(null) - POINT_SIZE / 2), POINT_SIZE, POINT_SIZE);
-
-            g.setColor(Color.BLACK);
         }
+    }
 
-        // Draw radius
-        if (travelRadius > 0 && highlightedCity != null)
+    private void drawPoints(Graphics g, HashMap<String, Point2D.Double> points)
+    {
+        // Draw City Points
+        for (String point : points.keySet())
         {
-            g.setColor(Color.red);
-            g.drawOval((int) (mapCities.get(highlightedCity).x * mapImage.getWidth(null) - travelRadius),
-                    (int) (mapCities.get(highlightedCity).y * mapImage.getHeight(null) - travelRadius),
-                    travelRadius * 2, travelRadius * 2);
+            g.fillOval((int) (points.get(point).x * mapImage.getWidth(null) - POINT_SIZE / 2 ),
+                    (int) (points.get(point).y * mapImage.getHeight(null) - POINT_SIZE / 2), POINT_SIZE, POINT_SIZE);
         }
     }
 

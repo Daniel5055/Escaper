@@ -26,29 +26,66 @@ public class CityEngine
             }
       }
 
-      public Point2D.Double getCity(String name) throws SQLException
+      public Point2D.Double getCityPoint(String name)
       {
-            PreparedStatement statement = connection.prepareStatement(
-                     "SELECT lat, lng FROM cities WHERE country = ? AND " +
-                             "( city = ? OR city_ascii = ? OR admin_name = ?) " +
-                             "ORDER BY population");
-
-            statement.setString(1, country);
-            statement.setString(2, name);
-            statement.setString(3, name);
-            statement.setString(4, name);
-
-            ResultSet coords = statement.executeQuery();
-
-            // Get coords, take first (most po
-            if (coords.next())
+            try
             {
-                  return new Point2D.Double(coords.getDouble(2), coords.getDouble(1));
+                  PreparedStatement statement = connection.prepareStatement(
+                          "SELECT lat, lng FROM cities WHERE country = ? AND " +
+                                  "( LOWER(city) = LOWER(?) OR " +
+                                  "LOWER(city_ascii) = LOWER(?) ) " +
+                                  "ORDER BY population");
+
+                  statement.setString(1, country);
+                  statement.setString(2, name);
+                  statement.setString(3, name);
+
+                  ResultSet coords = statement.executeQuery();
+
+                  // Get coords, take first (most po
+                  if (coords.next())
+                  {
+                        return new Point2D.Double(coords.getDouble(2), coords.getDouble(1));
+                  }
             }
-            else
+            catch (SQLException e)
             {
-                  // Return null if city not found in database
-                  return null;
+                  System.out.println(e.getStackTrace());
             }
+
+            // Else return null
+            return null;
+      }
+
+      public String getProperCityName(String name)
+      {
+            try
+            {
+                  PreparedStatement statement = connection.prepareStatement(
+                          "SELECT city FROM cities WHERE country = ? AND " +
+                                  "( LOWER(city) = LOWER(?) OR " +
+                                  "LOWER(city_ascii) = LOWER(?) ) " +
+                                  "ORDER BY population");
+
+                  statement.setString(1, country);
+                  statement.setString(2, name);
+                  statement.setString(3, name);
+
+                  ResultSet properName = statement.executeQuery();
+
+                  // Get name, take first (most populous)
+                  if (properName.next())
+                  {
+                        return properName.getString(1);
+                  }
+
+            }
+            catch (SQLException e)
+            {
+                  System.out.println(e.getStackTrace());
+            }
+
+            // Else return null
+            return null;
       }
 }
