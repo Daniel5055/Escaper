@@ -20,8 +20,7 @@ public class GUI extends JFrame implements ActionListener
 
     public GUI()
     {
-
-        cityEngine = new CityEngine("France");
+        cityEngine = new CityEngine("United Kingdom");
 
 
         // Layout and frame stuff
@@ -37,6 +36,7 @@ public class GUI extends JFrame implements ActionListener
         try
         {
             cityMap = new CityMap();
+            cityMap.setTravelRadius(50);
         }
         catch (IOException e)
         {
@@ -80,7 +80,8 @@ public class GUI extends JFrame implements ActionListener
         setResizable(false);
         setVisible(true);
 
-        for (double x = -10; x <= 2; x+= 0.4)
+        /*
+        for (double x = -10; x <= 2; x+= 0.1)
         {
             for (double y = 49; y <= 59; y += 0.3 )
             {
@@ -89,6 +90,7 @@ public class GUI extends JFrame implements ActionListener
             }
 
         }
+         */
     }
 
     @Override

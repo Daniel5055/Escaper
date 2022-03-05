@@ -9,17 +9,18 @@ import java.util.HashMap;
 
 public class CityMap extends JPanel
 {
+    // Borders of the map in long and lat
     private static final double LONG_MAX = 2.362;
     private static final double LONG_MIN = -10.728;
     private static final double LAT_MAX = 59.468;
     private static final double LAT_MIN = 48.86;
 
+    // Converted 2d coords
     private static double X_MAX;
     private static double X_MIN;
     private static double Y_MIN;
     private static double Y_MAX;
     private static final int POINT_SIZE = 4;
-
 
     private final Image mapImage;
     private final HashMap<String, Point2D.Double> mapCities;
@@ -103,20 +104,20 @@ public class CityMap extends JPanel
         if (travelRadius > 0 && highlightedCity != null)
         {
             g.setColor(Color.red);
-            g.drawOval((int) (mapCities.get(highlightedCity).x * getWidth() - travelRadius),
-                    (int) (mapCities.get(highlightedCity).y * getHeight() - travelRadius),
+            g.drawOval((int) (mapCities.get(highlightedCity).x * mapImage.getWidth(null) - travelRadius),
+                    (int) (mapCities.get(highlightedCity).y * mapImage.getHeight(null) - travelRadius),
                     travelRadius * 2, travelRadius * 2);
         }
     }
 
     private double getXFromLong(double longitude)
     {
-        return (longitude / 180 + 1);
+        // Everything is relative so this is technically not necessary
+        return longitude;
     }
 
     private double getYFromLat(double latitude)
     {
-        return 128 / Math.PI * (Math.PI - Math.log(Math.tan(Math.PI/4 + latitude * Math.PI / 360)));
-
+        return Math.log(Math.tan(Math.PI/4 + latitude * Math.PI / 360));
     }
 }
