@@ -28,14 +28,6 @@ public class CityEngine
 
       public Point2D.Double getCity(String name) throws SQLException
       {
-            StringBuilder sql = new StringBuilder();
-
-            sql.append("'");
-            sql.append(country);
-            sql.append(" AND (");
-            sql.append(name);
-            sql.append("=");
-            sql.append(" AND ");
             PreparedStatement statement = connection.prepareStatement(
                      "SELECT lat, lng FROM cities WHERE country = ? AND " +
                              "( city = ? OR city_ascii = ? OR admin_name = ?) " +
@@ -51,7 +43,7 @@ public class CityEngine
             // Get coords, take first (most po
             if (coords.next())
             {
-                  return new Point2D.Double(coords.getDouble(1), coords.getDouble(2));
+                  return new Point2D.Double(coords.getDouble(2), coords.getDouble(1));
             }
             else
             {

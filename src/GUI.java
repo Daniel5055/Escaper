@@ -21,7 +21,8 @@ public class GUI extends JFrame implements ActionListener
     public GUI()
     {
 
-        cityEngine = new CityEngine("United Kingdom");
+        cityEngine = new CityEngine("France");
+
 
         // Layout and frame stuff
         JPanel content = new JPanel();
@@ -78,6 +79,16 @@ public class GUI extends JFrame implements ActionListener
         setSize(570, 570);
         setResizable(false);
         setVisible(true);
+
+        for (double x = -10; x <= 2; x+= 0.4)
+        {
+            for (double y = 49; y <= 59; y += 0.3 )
+            {
+                cityMap.addCity(x + "" + y, x, y);
+
+            }
+
+        }
     }
 
     @Override

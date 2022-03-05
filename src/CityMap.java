@@ -9,10 +9,15 @@ import java.util.HashMap;
 
 public class CityMap extends JPanel
 {
-    private static final double LAT_MAX = 3;
-    private static final double LAT_MIN = -11;
-    private static final double LONG_MAX = 61;
-    private static final double LONG_MIN = 49;
+    private static final double LONG_MAX = 2.362;
+    private static final double LONG_MIN = -10.728;
+    private static final double LAT_MAX = 59.468;
+    private static final double LAT_MIN = 48.86;
+
+    private static double X_MAX;
+    private static double X_MIN;
+    private static double Y_MIN;
+    private static double Y_MAX;
     private static final int POINT_SIZE = 4;
 
 
@@ -25,11 +30,16 @@ public class CityMap extends JPanel
     public CityMap() throws IOException
     {
         BufferedImage rawImage = ImageIO.read(new File("uk.png"));
-        mapImage = rawImage.getScaledInstance(350, 500, Image.SCALE_SMOOTH);
+        mapImage = rawImage.getScaledInstance(223, 312, Image.SCALE_SMOOTH);
 
         mapCities = new HashMap<>();
 
         travelRadius = 0;
+
+        Y_MAX = getYFromLat(LAT_MAX);
+        X_MAX = getXFromLong(LONG_MAX);
+        Y_MIN = getYFromLat(LAT_MIN);
+        X_MIN = getXFromLong(LONG_MIN);
     }
 
     public void addCity(String city, Point2D.Double point)
@@ -42,12 +52,13 @@ public class CityMap extends JPanel
         System.out.println(latitude + " " + longitude);
         if (longitude >= LONG_MIN && longitude <= LONG_MAX && latitude >= LAT_MIN && latitude <= LAT_MAX)
         {
+            // Convert to mercator web friendly
             // convert to relative position based from 0 to 1
-            double relLongitude = (LONG_MAX - longitude) / (LONG_MAX - LONG_MIN);
-            double relLatitude = (latitude - LAT_MIN) / (LAT_MAX - LAT_MIN);
+            double relX = (getXFromLong(longitude) - X_MIN) / (X_MAX - X_MIN);
+            double relY = (Y_MAX - getYFromLat(latitude)) / (Y_MAX - Y_MIN);
 
             // place in points list
-            mapCities.put(city, new Point2D.Double(relLatitude, relLongitude));
+            mapCities.put(city, new Point2D.Double(relX, relY));
 
             // Make that the highlighted city
             highlightedCity = city;
@@ -82,8 +93,8 @@ public class CityMap extends JPanel
                 g.setColor(Color.magenta);
             }
 
-            g.fillOval((int) (mapCities.get(city).x * getWidth() - POINT_SIZE / 2 ),
-                    (int) (mapCities.get(city).y * getHeight() - POINT_SIZE / 2), POINT_SIZE, POINT_SIZE);
+            g.fillOval((int) (mapCities.get(city).x * mapImage.getWidth(null) - POINT_SIZE / 2 ),
+                    (int) (mapCities.get(city).y * mapImage.getHeight(null) - POINT_SIZE / 2), POINT_SIZE, POINT_SIZE);
 
             g.setColor(Color.BLACK);
         }
@@ -96,5 +107,16 @@ public class CityMap extends JPanel
                     (int) (mapCities.get(highlightedCity).y * getHeight() - travelRadius),
                     travelRadius * 2, travelRadius * 2);
         }
+    }
+
+    private double getXFromLong(double longitude)
+    {
+        return (longitude / 180 + 1);
+    }
+
+    private double getYFromLat(double latitude)
+    {
+        return 128 / Math.PI * (Math.PI - Math.log(Math.tan(Math.PI/4 + latitude * Math.PI / 360)));
+
     }
 }
