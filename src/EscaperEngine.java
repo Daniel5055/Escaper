@@ -16,6 +16,7 @@ public class EscaperEngine implements ActionListener
 
     // Logic and data attributes
     private CityEngine cityEngine;
+
     private int travelRange;
     private String currentCity;
 

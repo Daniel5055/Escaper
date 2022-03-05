@@ -6,3 +6,4 @@ out/
 *.jar
 sqlite3.exe
 csv/
+*.png

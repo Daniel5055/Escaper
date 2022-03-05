@@ -1,10 +1,12 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CityMap extends JPanel
@@ -28,6 +30,7 @@ public class CityMap extends JPanel
     private final Image mapImage;
     private final HashMap<String, Point2D.Double> mapCities;
     private final HashMap<String, Point2D.Double> farCities;
+    private final ArrayList<Line2D.Double> routes;
 
     // Game related data
     private int travelRadius;
@@ -35,14 +38,18 @@ public class CityMap extends JPanel
 
     public CityMap() throws IOException
     {
+        // Initialise and scale image
         BufferedImage rawImage = ImageIO.read(new File("uk.png"));
         mapImage = rawImage.getScaledInstance(350, 433, Image.SCALE_SMOOTH);
 
+        // Initialise hash maps and arrays
         mapCities = new HashMap<>();
         farCities = new HashMap<>();
+        routes = new ArrayList<>();
 
         travelRadius = 0;
 
+        // Calculate the relatvie points
         Y_MAX = getYFromLat(LAT_MAX);
         X_MAX = getXFromLong(LONG_MAX);
         Y_MIN = getYFromLat(LAT_MIN);
@@ -88,6 +95,12 @@ public class CityMap extends JPanel
             // convert to relative position based from 0 to 1
             // Place in points city
             mapCities.put(city, new Point2D.Double(getRelativeXFromLong(longitude), getRelativeYFromLat(latitude)));
+
+            // Add route if previous city exists
+            if (highlightedCity != null)
+            {
+                routes.add(new Line2D.Double(mapCities.get(highlightedCity), mapCities.get(city)));
+            }
 
             // Make that the highlighted city
             highlightedCity = city;
@@ -144,6 +157,14 @@ public class CityMap extends JPanel
         super.paintComponent(g);
         g.drawImage(mapImage, 0, 0, null);
 
+        // Draw routes
+        for (Line2D.Double route : routes)
+        {
+            g.setColor(Color.gray);
+            g.drawLine((int)(route.x1 * mapImage.getWidth(null)), (int)(route.y1 * mapImage.getHeight(null)),
+                    (int)(route.x2 * mapImage.getWidth(null)), (int)(route.y2 * mapImage.getHeight(null)));
+        }
+
         // Draw cities
         g.setColor(Color.red);
         drawPoints(g, farCities);
@@ -168,6 +189,7 @@ public class CityMap extends JPanel
                         travelRadius * 2, travelRadius * 2);
             }
         }
+
     }
 
     private void drawPoints(Graphics g, HashMap<String, Point2D.Double> points)
