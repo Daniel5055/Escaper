@@ -1,3 +1,4 @@
+import java.awt.geom.Point2D;
 import java.sql.*;
 
 public class CityEngine
@@ -25,7 +26,7 @@ public class CityEngine
             }
       }
 
-      public double[] getCity(String name) throws SQLException
+      public Point2D.Double getCity(String name) throws SQLException
       {
             StringBuilder sql = new StringBuilder();
 
@@ -50,7 +51,7 @@ public class CityEngine
             // Get coords, take first (most po
             if (coords.next())
             {
-                  return new double[]{coords.getDouble(1), coords.getDouble(2)};
+                  return new Point2D.Double(coords.getDouble(1), coords.getDouble(2));
             }
             else
             {
