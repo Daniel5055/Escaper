@@ -54,12 +54,8 @@ public class CityEngine
             }
             else
             {
-                  return new double[]{0, 0};
+                  // Return null if city not found in database
+                  return null;
             }
-
-
-
       }
-
-
 }
