@@ -18,13 +18,19 @@ public class EscaperEngine
         cityEngine = new CityEngine();
         cityEngine.addCountryConstraint("United Kingdom");
 
+        // Frame initialization
         frame = new JFrame();
-        frame.setMinimumSize(new Dimension(700, 650));
+        frame.setMinimumSize(new Dimension(750, 650));
+        frame.getContentPane().setBackground(EscaperTheme.oceanGray);
         frame.setResizable(true);
         frame.setVisible(true);
 
         String[] cities = getDistantCities();
-        state = new EscaperState(this, 50, cities[0], cities[1]);
+        EscaperState s = new EscaperState(this, 50, cities[0], cities[1]);
+
+        // Must call to initiate state start
+        s.popUpStartDialog();
+        state = s;
     }
 
     public String[] getDistantCities()
@@ -51,8 +57,8 @@ public class EscaperEngine
     public void nextState(State state)
     {
         this.state = state;
+        state.start();
     }
-
 
     public JFrame getFrame()
     {

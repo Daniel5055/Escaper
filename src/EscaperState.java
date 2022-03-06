@@ -22,6 +22,7 @@ public class EscaperState extends State implements ActionListener
     private JLabel dialogCityPlurality;
 
     private CityEngine cityEngine;
+    private EscaperEngine engine;
 
     private int travelRange;
     private String currentCity;
@@ -33,6 +34,7 @@ public class EscaperState extends State implements ActionListener
     {
         // Initialise engine
         cityEngine = engine.getCityEngine();
+        this.engine = engine;
 
         // Set the state data
         this.startCity = startCity;
@@ -42,7 +44,10 @@ public class EscaperState extends State implements ActionListener
         this.numberOfCities = 0;
 
         frame = engine.getFrame();
+    }
 
+    public void start()
+    {
         // Initialise content pane
         JPanel content = new JPanel();
         content.setBackground(EscaperTheme.oceanGray);
@@ -187,9 +192,9 @@ public class EscaperState extends State implements ActionListener
             public void actionPerformed(ActionEvent e)
             {
                 // Play again
-                winDialog.setVisible(false);
+                winDialog.dispose();
                 String[] cities = engine.getDistantCities();
-                engine.nextState(new EscaperState(engine, 50, cities[0], cities[1]));
+                engine.nextState(new EscaperState(engine, travelRange, cities[0], cities[1]));
 
             }
         });
@@ -259,8 +264,176 @@ public class EscaperState extends State implements ActionListener
         winDialog.setResizable(false);
         winDialog.setLocation(frame.getLocation().x + 200, frame.getLocation().y + 200);
         winDialog.setLayout(new BoxLayout(winDialog.getContentPane(), BoxLayout.Y_AXIS));
+        winDialog.setUndecorated(true);
 
         winDialog.getContentPane().setBackground(EscaperTheme.oceanGray);
+    }
+
+
+    public void popUpStartDialog()
+    {
+        JDialog dialog = new JDialog(frame);
+
+        dialog.setSize(400, 500);
+        dialog.setResizable(false);
+        dialog.setLocation(frame.getLocation().x + 200, frame.getLocation().y + 200);
+        dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
+        dialog.setUndecorated(true);
+
+        dialog.getContentPane().setBackground(EscaperTheme.oceanGray);
+
+        // Title
+        JLabel title = new JLabel("Escaper");
+        title.setBorder(new EmptyBorder(0, 0, 10, 0));
+        title.setForeground(EscaperTheme.lightGray);
+        title.setFont(EscaperTheme.largeFont);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dialog.add(title);
+
+        // Context
+        JLabel context = new JLabel("<html> <p align=\"center\">You (an undercover murderer!) are on the run. The police are starting to catch " +
+                "up on your tail, and so you've got to go into hiding. However, you can only go so far when travelling " +
+                "between cities. Travel through cities close enough to reach to arrive at your destination! " +
+                "The less cities the better!</p> </html>");
+        context.setForeground(EscaperTheme.lightGray);
+        context.setFont(EscaperTheme.mediumFont);
+        context.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dialog.add(context);
+
+        // Difficulty selection
+        JLabel difficultySelect = new JLabel("Select your cup of tea:");
+        difficultySelect.setForeground(EscaperTheme.lightGray);
+        difficultySelect.setFont(EscaperTheme.largeFont);
+        difficultySelect.setBorder(new EmptyBorder(50, 0, 20, 0));
+        difficultySelect.setAlignmentX(Component.CENTER_ALIGNMENT);
+        dialog.add(difficultySelect);
+
+        JPanel buttonWrapper = new JPanel();
+        buttonWrapper.setBackground(EscaperTheme.oceanGray);
+        buttonWrapper.setLayout(new FlowLayout());
+
+        JButton hard = new JButton("Hard");
+        hard.setContentAreaFilled(false);
+        hard.setFont(EscaperTheme.largeFont);
+        hard.setForeground(EscaperTheme.lightGray);
+        hard.setBorder(new EmptyBorder(20, 0, 10, 0));
+        hard.setPreferredSize(new Dimension(100, 50));
+
+        hard.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                travelRange = 30;
+                start();
+                dialog.dispose();
+            }
+        });
+
+        hard.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent e)
+            {
+                if (hard.getModel().isPressed())
+                {
+                    hard.setForeground(EscaperTheme.landGray);
+                }
+                else if (hard.getModel().isRollover())
+                {
+                    hard.setForeground(EscaperTheme.pastGray);
+                }
+                else
+                {
+                    hard.setForeground(EscaperTheme.lightGray);
+                }
+            }
+        });
+
+        JButton normal = new JButton("Normal");
+        normal.setContentAreaFilled(false);
+        normal.setFont(EscaperTheme.largeFont);
+        normal.setForeground(EscaperTheme.lightGray);
+        normal.setBorder(new EmptyBorder(20, 0, 10, 0));
+        normal.setPreferredSize(new Dimension(150, 50));
+
+        normal.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                // Normal
+                travelRange = 50;
+                start();
+                dialog.dispose();
+            }
+        });
+
+        normal.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent e)
+            {
+                if (normal.getModel().isPressed())
+                {
+                    normal.setForeground(EscaperTheme.landGray);
+                }
+                else if (normal.getModel().isRollover())
+                {
+                    normal.setForeground(EscaperTheme.pastGray);
+                }
+                else
+                {
+                    normal.setForeground(EscaperTheme.lightGray);
+                }
+            }
+        });
+
+        JButton easy = new JButton("Easy");
+        easy.setContentAreaFilled(false);
+        easy.setFont(EscaperTheme.largeFont);
+        easy.setForeground(EscaperTheme.lightGray);
+        easy.setBorder(new EmptyBorder(20, 0, 10, 0));
+        easy.setPreferredSize(new Dimension(100, 50));
+
+        easy.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                //Easy
+                travelRange = 80;
+                start();
+                dialog.dispose();
+            }
+        });
+
+        easy.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent e)
+            {
+                if (easy.getModel().isPressed())
+                {
+                    easy.setForeground(EscaperTheme.landGray);
+                }
+                else if (easy.getModel().isRollover())
+                {
+                    easy.setForeground(EscaperTheme.pastGray);
+                }
+                else
+                {
+                    easy.setForeground(EscaperTheme.lightGray);
+                }
+            }
+        });
+
+        buttonWrapper.add(hard);
+        buttonWrapper.add(normal);
+        buttonWrapper.add(easy);
+
+        dialog.add(buttonWrapper);
+        dialog.setVisible(true);
     }
 
     // Implemented method from ActionListener
@@ -290,7 +463,7 @@ public class EscaperState extends State implements ActionListener
                 // Must not be current city either
                 if (currentCity.equalsIgnoreCase(properName))
                 {
-
+                    // May add logging here
                 }
                 else
                 {
