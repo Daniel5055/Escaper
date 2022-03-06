@@ -14,13 +14,11 @@ public class CityEngine
       // Scope
       private ArrayList<String> countries;
 
-      //
-
-
       public CityEngine()
       {
             countries = new ArrayList<>();
 
+            // Make connection
             try
             {
                   String dbUrl = "jdbc:sqlite:" + DATA_PATH;

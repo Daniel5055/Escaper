@@ -21,15 +21,18 @@ public class EscaperState extends State implements ActionListener
     private JLabel dialogCityCount;
     private JLabel dialogCityPlurality;
 
+    // Engines
     private CityEngine cityEngine;
     private EscaperEngine engine;
 
+    // Data
     private int travelRange;
     private String currentCity;
     private String endCity;
     private String startCity;
     private int numberOfCities;
 
+    // Map specific data, UK excluded as already added
     private final String[] europeCountries = new String[]{
             "Spain", "Portugal", "Ireland", "France", "Andorra", "Monaco", "Italy", "Vatican City",
             "San Marino", "Cyprus", "Greece", "Albania", "Montenegro", "Serbia", "Kosovo", "Macedonia",
@@ -38,9 +41,11 @@ public class EscaperState extends State implements ActionListener
             "Denmark", "Germany", "Netherlands", "Belgium", "Luxembourg", "Switzerland", "Austria", "Czechia", "Slovakia",
             "Liechtenstein", "Poland"};
 
+    // Constructor
     public EscaperState(EscaperEngine engine, int travelRange, String startCity, String endCity, String region)
      {
         this.region = region;
+
         // Initialise engine
         cityEngine = engine.getCityEngine();
         this.engine = engine;
@@ -68,6 +73,7 @@ public class EscaperState extends State implements ActionListener
         // Initialise cityMap
         try
         {
+            // Adding the countries to cityEngine if Europe selected
             if (region.equalsIgnoreCase("Europe"))
             {
                 for (String country : europeCountries)
@@ -156,7 +162,6 @@ public class EscaperState extends State implements ActionListener
         c.fill = GridBagConstraints.BOTH;
         frame.add(startCityLabel, c);
 
-
         c.gridy = 1;
         c.gridx = 0;
         c.fill = GridBagConstraints.BOTH;
@@ -168,6 +173,7 @@ public class EscaperState extends State implements ActionListener
         // Dialog box initialisation
         winDialog = new JDialog(frame);
 
+        // Initialisation of Dialog text
         JLabel dialogWinStatement = new JLabel("You Escaped!");
         dialogWinStatement.setBorder(new EmptyBorder(0, 0, 10, 0));
         dialogWinStatement.setFont(EscaperTheme.largeFont);
@@ -193,6 +199,7 @@ public class EscaperState extends State implements ActionListener
         dialogCityPlurality.setAlignmentX(Component.CENTER_ALIGNMENT);
         winDialog.add(dialogCityPlurality);
 
+        // Initialisation of the play button and exit button, wrapped in panel
         JPanel dialogButtonWrapper = new JPanel();
         dialogButtonWrapper.setBackground(EscaperTheme.oceanGray);
         dialogButtonWrapper.setLayout(new FlowLayout());
@@ -204,6 +211,7 @@ public class EscaperState extends State implements ActionListener
         dialogReplayButton.setBorder(new EmptyBorder(20, 0, 10, 0));
         dialogReplayButton.setPreferredSize(new Dimension(95, 30));
 
+        // On press
         dialogReplayButton.addActionListener(new ActionListener()
         {
             @Override
@@ -217,6 +225,7 @@ public class EscaperState extends State implements ActionListener
             }
         });
 
+        // On state change
         dialogReplayButton.addChangeListener(new ChangeListener()
         {
             @Override
@@ -244,6 +253,7 @@ public class EscaperState extends State implements ActionListener
         dialogExitButton.setBorder(new EmptyBorder(20, 0, 10, 0));
         dialogExitButton.setPreferredSize(new Dimension(95, 30));
 
+        // on press
         dialogExitButton.addActionListener(new ActionListener()
         {
             @Override
@@ -254,6 +264,7 @@ public class EscaperState extends State implements ActionListener
             }
         });
 
+        // On state change
         dialogExitButton.addChangeListener(new ChangeListener()
         {
             @Override
@@ -283,13 +294,13 @@ public class EscaperState extends State implements ActionListener
         winDialog.setLocation(frame.getLocation().x + 200, frame.getLocation().y + 200);
         winDialog.setLayout(new BoxLayout(winDialog.getContentPane(), BoxLayout.Y_AXIS));
         winDialog.setUndecorated(true);
-
         winDialog.getContentPane().setBackground(EscaperTheme.oceanGray);
     }
 
 
     public void popUpStartDialog()
     {
+        // Initialisation of start dialog box
         JDialog dialog = new JDialog(frame);
 
         dialog.setSize(400, 500);
@@ -566,8 +577,8 @@ public class EscaperState extends State implements ActionListener
         }
         else
         {
+            // Not valid city
             cityLog.append(text + " ?\n");
         }
     }
-
 }
