@@ -1,5 +1,7 @@
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -67,36 +69,48 @@ public class EscaperState extends State implements ActionListener
         cityLog = new JTextArea(20, 20);
         JScrollPane pane = new JScrollPane(cityLog);
         pane.setBorder(null);
+        pane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
+        pane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         cityLog.setEditable(false);
-        cityLog.setBorder(new EmptyBorder(3, 3, 3, 3));
+        cityLog.setBorder(new CompoundBorder(new MatteBorder(0, 1, 0, 0, EscaperTheme.lightGray),
+                new EmptyBorder(3, 3, 3, 3)));
 
         cityLog.setFont(EscaperTheme.mediumFont);
-        cityLog.setForeground(EscaperTheme.oceanGray);
-        cityLog.setBackground(EscaperTheme.pastGray);
+        cityLog.setForeground(EscaperTheme.lightGray);
+        cityLog.setBackground(EscaperTheme.oceanGray);
 
         // Initialise inputBox
-        inputBox = new JTextField(20);
+        inputBox = new JTextField(8);
+        inputBox.setFocusable(true);
+        inputBox.requestFocusInWindow();
         inputBox.addActionListener(this);
-        inputBox.setBorder(new EmptyBorder(3, 3, 3, 3));
+        inputBox.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, EscaperTheme.lightGray),
+                new EmptyBorder(3, 3, 3, 3)));
 
-        inputBox.setFont(EscaperTheme.mediumFont);
-        inputBox.setForeground(EscaperTheme.oceanGray);
-        inputBox.setBackground(EscaperTheme.pastGray);
+        inputBox.setFont(EscaperTheme.largeFont);
+        inputBox.setBackground(EscaperTheme.oceanGray);
+        inputBox.setForeground(EscaperTheme.lightGray);
+
+        // Initialise start label
+        JLabel startCityLabel = new JLabel("You are in " + startCity, SwingConstants.CENTER);
+        startCityLabel.setBorder(new EmptyBorder(0, 0, 10, 0));
+        startCityLabel.setFont(EscaperTheme.largeFont);
+        startCityLabel.setForeground(Color.lightGray);
 
         // Initialise location label
-        JLabel locationLabel = new JLabel("Get to " + endCity + "!", SwingConstants.CENTER);
-        locationLabel.setFont(EscaperTheme.largeFont);
-        locationLabel.setForeground(Color.lightGray);
+        JLabel endCityLabel = new JLabel("Get to " + endCity + "!", SwingConstants.CENTER);
+        endCityLabel.setBorder(new EmptyBorder(0, 0, 20, 0));
+        endCityLabel.setFont(EscaperTheme.largeFont);
+        endCityLabel.setForeground(Color.lightGray);
 
         // Create layout constraints and add components to frame
         GridBagConstraints c = new GridBagConstraints();
 
         c.gridx=0;
-        c.gridy=0;
+        c.gridy=2;
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 1;
         c.weighty = 1;
-        c.gridheight=2;
         c.insets = new Insets(0, 0, 0, 10);
         frame.add(cityMap, c);
 
@@ -104,19 +118,26 @@ public class EscaperState extends State implements ActionListener
         c.weightx=0;
         c.weighty=0;
         c.gridx = 1;
-        c.gridy = 0;
+        c.gridy = 2;
         c.gridheight=1;
         frame.add(pane, c );
 
-        c.gridx = 1;
-        c.gridy = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 2;
         frame.add(inputBox, c);
 
-        c.gridy = 2;
+        c.gridy = 0;
         c.gridx = 0;
-        c.gridwidth = 2;
         c.fill = GridBagConstraints.BOTH;
-        frame.add(locationLabel, c);
+        frame.add(startCityLabel, c);
+
+
+        c.gridy = 1;
+        c.gridx = 0;
+        c.fill = GridBagConstraints.BOTH;
+        frame.add(endCityLabel, c);
 
         // Show frame
         frame.setVisible(true);
@@ -269,14 +290,13 @@ public class EscaperState extends State implements ActionListener
                 // Must not be current city either
                 if (currentCity.equalsIgnoreCase(properName))
                 {
-                    cityLog.append("You are already in " + currentCity + "\n");
 
                 }
                 else
                 {
                     // Can move to city
                     cityMap.addCity(properName, point);
-                    cityLog.append(currentCity + " -> " + properName  + "\n");
+                    cityLog.append(currentCity + " > > > " + properName  + "\n");
                     currentCity = properName;
                     numberOfCities++;
 
@@ -295,13 +315,11 @@ public class EscaperState extends State implements ActionListener
             else
             {
                 cityMap.addFarCity(properName, point);
-                cityLog.append(properName + " is too far to travel to!\n");
             }
         }
         else
         {
-            // Invalid city put
-            cityLog.append(text + " is not a valid city\n");
+            cityLog.append(text + " ?\n");
         }
     }
 

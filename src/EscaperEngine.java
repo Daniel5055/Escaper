@@ -17,10 +17,9 @@ public class EscaperEngine
     {
         cityEngine = new CityEngine();
         cityEngine.addCountryConstraint("United Kingdom");
-        cityEngine.addCountryConstraint("Ireland");
 
         frame = new JFrame();
-        frame.setMinimumSize(new Dimension(700, 550));
+        frame.setMinimumSize(new Dimension(700, 650));
         frame.setResizable(true);
         frame.setVisible(true);
 
