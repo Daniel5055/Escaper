@@ -11,21 +11,29 @@ import java.util.HashMap;
 
 public class CityMap extends JPanel
 {
+    // Europe and UK borders
+    private final static double[] UK_LIM = new double[]{2.2, -10.7618, 59.157, 49.86};
+    private final static double[] EUROPE_LIM = new double[]{43.376, -11.727, 71.265, 33.767};
+
+    // Europe and UK path
+    private final static String UK_PATH = "uk-cool.png";
+    private final static String EUROPE_PATH = "europe-cool.png";
+
     // Borders of the map in long and lat
-    private static final double LONG_MAX = 2.2;
-    private static final double LONG_MIN = -10.762;
-    private static final double LAT_MAX = 59.1565;
-    private static final double LAT_MIN = 49.86;
+    private static double LONG_MAX = 2.2;
+    private static double LONG_MIN = -10.7618;
+    private static double LAT_MAX = 59.157;
+    private static double LAT_MIN = 49.86;
 
     // Map URL
-    private static final String MAP_PATH = "uk-coool.png";
+    private final String MAP_PATH;
 
 
     // Converted 2d coords
-    private static double X_MAX;
-    private static double X_MIN;
-    private static double Y_MIN;
-    private static double Y_MAX;
+    private final double X_MAX;
+    private final double X_MIN;
+    private final double Y_MIN;
+    private final double Y_MAX;
 
     // Size of points
     private static final int POINT_SIZE = 4;
@@ -41,11 +49,30 @@ public class CityMap extends JPanel
     private String highlightedCity;
     private Point2D.Double endCity;
 
-    public CityMap() throws IOException
+    public CityMap(String preset) throws IOException
     {
+        if (preset.equalsIgnoreCase("Europe"))
+        {
+            LONG_MAX = EUROPE_LIM[0];
+            LONG_MIN = EUROPE_LIM[1];
+            LAT_MAX = EUROPE_LIM[2];
+            LAT_MIN = EUROPE_LIM[3];
+            MAP_PATH = EUROPE_PATH;
+        }
+        else
+        {
+            LONG_MAX = UK_LIM[0];
+            LONG_MIN = UK_LIM[1];
+            LAT_MAX = UK_LIM[2];
+            LAT_MIN = UK_LIM[3];
+            MAP_PATH = UK_PATH;
+        }
+
+
         // Initialise and scale image
         BufferedImage rawImage = ImageIO.read(new File(MAP_PATH));
-        mapImage = rawImage.getScaledInstance(350, 433, Image.SCALE_SMOOTH);
+        mapImage = rawImage.getScaledInstance((int)(rawImage.getWidth() / 1.85), (int)(rawImage.getHeight() / 1.85),
+                Image.SCALE_SMOOTH);
 
         // Initialise hash maps and arrays
         mapCities = new HashMap<>();
@@ -135,7 +162,7 @@ public class CityMap extends JPanel
     public void addEndCity(String city, double longitude, double latitude) throws IndexOutOfBoundsException
     {
         // if inbounds of map
-        if (longitude >= LONG_MIN && longitude <= LONG_MAX && latitude >= LAT_MIN && latitude <= LAT_MAX)
+        if (isInBound(longitude, latitude))
         {
             // Convert to mercator web friendly
             // convert to relative position based from 0 to 1
@@ -152,6 +179,16 @@ public class CityMap extends JPanel
         {
             throw new IndexOutOfBoundsException();
         }
+    }
+
+    public static boolean isInBound(double longitude, double latitude)
+    {
+        return longitude >= LONG_MIN && longitude <= LONG_MAX && latitude >= LAT_MIN && latitude <= LAT_MAX;
+    }
+
+    public static boolean isInBound(Point2D.Double point)
+    {
+        return isInBound(point.x, point.y);
     }
 
     public Point2D.Double getLastCityPoint()

@@ -13,6 +13,7 @@ public class EscaperEngine
     JFrame frame;
     CityEngine cityEngine;
 
+
     public EscaperEngine()
     {
         cityEngine = new CityEngine();
@@ -26,7 +27,7 @@ public class EscaperEngine
         frame.setVisible(true);
 
         String[] cities = getDistantCities();
-        EscaperState s = new EscaperState(this, 50, cities[0], cities[1]);
+        EscaperState s = new EscaperState(this, 0, cities[0], cities[1], "United Kingdom");
 
         // Must call to initiate state start
         s.popUpStartDialog();
@@ -38,7 +39,12 @@ public class EscaperEngine
         // First get random city
         String[] cities = new String[2];
 
-        cities[0] = cityEngine.getRandomCity();
+        do
+        {
+            // Check that random city is inboud
+            cities[0] = cityEngine.getRandomCity();
+        }
+        while (!CityMap.isInBound(cityEngine.getCityPoint(cities[0])));
 
         Point2D.Double startPoint = cityEngine.getCityPoint(cities[0]);
         Point2D.Double endPoint = null;
@@ -49,7 +55,8 @@ public class EscaperEngine
             cities[1] = cityEngine.getRandomCity();
             endPoint = cityEngine.getCityPoint(cities[1]);
         }
-        while (Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2)) < 5);
+        while (Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2)) < 5 ||
+        !CityMap.isInBound(cityEngine.getCityPoint(cities[1])));
 
         return cities;
     }
@@ -57,7 +64,7 @@ public class EscaperEngine
     public void nextState(State state)
     {
         this.state = state;
-        state.start();
+        state.start(state.getRegion());
     }
 
     public JFrame getFrame()

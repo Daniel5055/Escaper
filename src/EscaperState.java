@@ -30,8 +30,17 @@ public class EscaperState extends State implements ActionListener
     private String startCity;
     private int numberOfCities;
 
-    public EscaperState(EscaperEngine engine, int travelRange, String startCity, String endCity)
-    {
+    private final String[] europeCountries = new String[]{
+            "Spain", "Portugal", "Ireland", "France", "Andorra", "Monaco", "Italy", "Vatican City",
+            "San Marino", "Cyprus", "Greece", "Albania", "Montenegro", "Serbia", "Kosovo", "Macedonia",
+            "Bosnia And Herzegovina", "Croatia", "Slovenia", "Bulgaria", "Hungary", "Malta", "Romania", "Moldova",
+            "Turkey", "Ukraine", "Belarus", "Russia", "Estonia", "Latvia", "Lithuania", "Finland", "Norway", "Sweden",
+            "Denmark", "Germany", "Netherlands", "Belgium", "Luxembourg", "Switzerland", "Austria", "Czechia", "Slovakia",
+            "Liechtenstein", "Poland"};
+
+    public EscaperState(EscaperEngine engine, int travelRange, String startCity, String endCity, String region)
+     {
+        this.region = region;
         // Initialise engine
         cityEngine = engine.getCityEngine();
         this.engine = engine;
@@ -46,7 +55,7 @@ public class EscaperState extends State implements ActionListener
         frame = engine.getFrame();
     }
 
-    public void start()
+    public void start(String region)
     {
         // Initialise content pane
         JPanel content = new JPanel();
@@ -59,11 +68,20 @@ public class EscaperState extends State implements ActionListener
         // Initialise cityMap
         try
         {
-            cityMap = new CityMap();
+            if (region.equalsIgnoreCase("Europe"))
+            {
+                for (String country : europeCountries)
+                {
+                    cityEngine.addCountryConstraint(country);
+                }
+            }
+
+            cityMap = new CityMap(region);
             cityMap.setTravelRadius(travelRange);
             cityMap.addCity(currentCity, cityEngine.getCityPoint(currentCity));
             cityMap.setBackground(EscaperTheme.oceanGray);
             cityMap.addEndCity(endCity, cityEngine.getCityPoint(endCity));
+
         }
         catch (IOException e)
         {
@@ -194,7 +212,7 @@ public class EscaperState extends State implements ActionListener
                 // Play again
                 winDialog.dispose();
                 String[] cities = engine.getDistantCities();
-                engine.nextState(new EscaperState(engine, travelRange, cities[0], cities[1]));
+                engine.nextState(new EscaperState(engine, travelRange, cities[0], cities[1], region));
 
             }
         });
@@ -291,7 +309,7 @@ public class EscaperState extends State implements ActionListener
         dialog.add(title);
 
         // Context
-        JLabel context = new JLabel("<html> <p align=\"center\">You (an undercover murderer!) are on the run. The police are starting to catch " +
+        JLabel context = new JLabel("<html> <p align=\"center\">You (an undercover murderer!) are on the run in the UK. The police are starting to catch " +
                 "up on your tail, and so you've got to go into hiding. However, you can only go so far when travelling " +
                 "between cities. Travel through cities close enough to reach to arrive at your destination! " +
                 "The less cities the better!</p> </html>");
@@ -299,6 +317,47 @@ public class EscaperState extends State implements ActionListener
         context.setFont(EscaperTheme.mediumFont);
         context.setAlignmentX(Component.CENTER_ALIGNMENT);
         dialog.add(context);
+
+        // Region choice
+        JButton playInEurope = new JButton("Play in Europe");
+        playInEurope.setContentAreaFilled(false);
+        playInEurope.setFont(EscaperTheme.largeFont);
+        playInEurope.setForeground(EscaperTheme.lightGray);
+        playInEurope.setBorder(new EmptyBorder(20, 0, 10, 0));
+        playInEurope.setAlignmentX(Component.CENTER_ALIGNMENT);
+        playInEurope.setPreferredSize(new Dimension(300, 60));
+
+        playInEurope.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                region = "Europe";
+                startCity = "London";
+                endCity = "Istanbul";
+            }
+        });
+
+        playInEurope.addChangeListener(new ChangeListener()
+        {
+            @Override
+            public void stateChanged(ChangeEvent e)
+            {
+                if (playInEurope.getModel().isPressed())
+                {
+                    playInEurope.setForeground(EscaperTheme.landGray);
+                }
+                else if (playInEurope.getModel().isRollover())
+                {
+                    playInEurope.setForeground(EscaperTheme.pastGray);
+                }
+                else
+                {
+                    playInEurope.setForeground(EscaperTheme.lightGray);
+                }
+            }
+        });
+        dialog.add(playInEurope);
 
         // Difficulty selection
         JLabel difficultySelect = new JLabel("Select your cup of tea:");
@@ -325,7 +384,7 @@ public class EscaperState extends State implements ActionListener
             public void actionPerformed(ActionEvent e)
             {
                 travelRange = 30;
-                start();
+                start(region);
                 dialog.dispose();
             }
         });
@@ -364,7 +423,7 @@ public class EscaperState extends State implements ActionListener
             {
                 // Normal
                 travelRange = 50;
-                start();
+                start(region);
                 dialog.dispose();
             }
         });
@@ -403,7 +462,7 @@ public class EscaperState extends State implements ActionListener
             {
                 //Easy
                 travelRange = 80;
-                start();
+                start(region);
                 dialog.dispose();
             }
         });
@@ -468,26 +527,41 @@ public class EscaperState extends State implements ActionListener
                 else
                 {
                     // Can move to city
-                    cityMap.addCity(properName, point);
-                    cityLog.append(currentCity + " > > > " + properName  + "\n");
-                    currentCity = properName;
-                    numberOfCities++;
-
-                    // If win condition
-                    if (currentCity.equalsIgnoreCase(endCity))
+                    try
                     {
-                        winDialog.setVisible(true);
-                        dialogCityCount.setText("" + numberOfCities);
-                        if (numberOfCities == 1)
+                        cityMap.addCity(properName, point);
+                        cityLog.append(currentCity + " > > > " + properName  + "\n");
+                        currentCity = properName;
+                        numberOfCities++;
+
+                        // If win condition
+                        if (currentCity.equalsIgnoreCase(endCity))
                         {
-                            dialogCityPlurality.setText("city");
+                            winDialog.setVisible(true);
+                            dialogCityCount.setText("" + numberOfCities);
+                            if (numberOfCities == 1)
+                            {
+                                dialogCityPlurality.setText("city");
+                            }
                         }
+                    }
+                    catch (IndexOutOfBoundsException ex)
+                    {
+                        // City entered is not on map
+                        cityLog.append(properName + " is not visible on the map :'(\n");
                     }
                 }
             }
             else
             {
-                cityMap.addFarCity(properName, point);
+                try
+                {
+                    cityMap.addFarCity(properName, point);
+                }
+                catch (IndexOutOfBoundsException ex)
+                {
+                    cityLog.append(properName + " is not visible on the map :'(\n");
+                }
             }
         }
         else
