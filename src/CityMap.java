@@ -20,13 +20,6 @@ public class CityMap extends JPanel
     // Map URL
     private static final String MAP_PATH = "uk-coool.png";
 
-    // Colours
-    public static final Color lightGray = new Color(147, 159, 155);
-    public static final Color oceanGray = new Color(32, 36, 39);
-    public static final Color landGray = new Color(77, 96, 89);
-    public static final Color pastGray = new Color(127, 141, 137);
-    public static final Color wrongRed = new Color(224, 161, 161);
-
 
     // Converted 2d coords
     private static double X_MAX;
@@ -46,6 +39,7 @@ public class CityMap extends JPanel
     // Game related data
     private int travelRadius;
     private String highlightedCity;
+    private Point2D.Double endCity;
 
     public CityMap() throws IOException
     {
@@ -65,8 +59,6 @@ public class CityMap extends JPanel
         X_MAX = getXFromLong(LONG_MAX);
         Y_MIN = getYFromLat(LAT_MIN);
         X_MIN = getXFromLong(LONG_MIN);
-
-        setBackground(oceanGray);
     }
 
     public void addFarCity(String city, Point2D.Double point) throws IndexOutOfBoundsException
@@ -136,6 +128,32 @@ public class CityMap extends JPanel
         repaint();
     }
 
+    public void addEndCity(String city, Point2D.Double point) throws IndexOutOfBoundsException
+    {
+        addEndCity(city, point.x, point.y);
+    }
+    public void addEndCity(String city, double longitude, double latitude) throws IndexOutOfBoundsException
+    {
+        // if inbounds of map
+        if (longitude >= LONG_MIN && longitude <= LONG_MAX && latitude >= LAT_MIN && latitude <= LAT_MAX)
+        {
+            // Convert to mercator web friendly
+            // convert to relative position based from 0 to 1
+            double relX = (getXFromLong(longitude) - X_MIN) / (X_MAX - X_MIN);
+            double relY = (Y_MAX - getYFromLat(latitude)) / (Y_MAX - Y_MIN);
+
+            // place in far points list
+            endCity = new Point2D.Double(relX, relY);
+
+            // Repaint list
+            repaint();
+        }
+        else
+        {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
     public Point2D.Double getLastCityPoint()
     {
         return mapCities.get(highlightedCity);
@@ -170,22 +188,28 @@ public class CityMap extends JPanel
         // Draw routes
         for (Line2D.Double route : routes)
         {
-            g.setColor(pastGray);
+            g.setColor(EscaperTheme.pastGray);
             g.drawLine((int)(route.x1 * mapImage.getWidth(null)), (int)(route.y1 * mapImage.getHeight(null)),
                     (int)(route.x2 * mapImage.getWidth(null)), (int)(route.y2 * mapImage.getHeight(null)));
         }
 
+        // Draw end city
+        g.setColor(EscaperTheme.rightGreen);
+        g.fillOval((int) (endCity.x * mapImage.getWidth(null) - POINT_SIZE / 2 ),
+                (int) (endCity.y * mapImage.getHeight(null) - POINT_SIZE / 2),
+                POINT_SIZE, POINT_SIZE);
+
         // Draw cities
-        g.setColor(wrongRed);
+        g.setColor(EscaperTheme.wrongRed);
         drawPoints(g, farCities);
 
-        g.setColor(pastGray);
+        g.setColor(EscaperTheme.pastGray);
         drawPoints(g, mapCities);
 
         // Draw highlighted city
         if (highlightedCity != null)
         {
-            g.setColor(lightGray);
+            g.setColor(EscaperTheme.lightGray);
             g.fillOval((int) (mapCities.get(highlightedCity).x * mapImage.getWidth(null) - POINT_SIZE / 2 ),
                     (int) (mapCities.get(highlightedCity).y * mapImage.getHeight(null) - POINT_SIZE / 2),
                     POINT_SIZE, POINT_SIZE);
