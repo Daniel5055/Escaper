@@ -4,8 +4,6 @@
       <root url="jar://$PROJECT_DIR$/sqlite-jdbc-3.8.7.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/sqlite-jdbc-3.8.7.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

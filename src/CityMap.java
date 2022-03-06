@@ -17,6 +17,17 @@ public class CityMap extends JPanel
     private static final double LAT_MAX = 59.1565;
     private static final double LAT_MIN = 49.86;
 
+    // Map URL
+    private static final String MAP_PATH = "uk-coool.png";
+
+    // Colours
+    public static final Color lightGray = new Color(147, 159, 155);
+    public static final Color oceanGray = new Color(32, 36, 39);
+    public static final Color landGray = new Color(77, 96, 89);
+    public static final Color pastGray = new Color(127, 141, 137);
+    public static final Color wrongRed = new Color(224, 161, 161);
+
+
     // Converted 2d coords
     private static double X_MAX;
     private static double X_MIN;
@@ -39,7 +50,7 @@ public class CityMap extends JPanel
     public CityMap() throws IOException
     {
         // Initialise and scale image
-        BufferedImage rawImage = ImageIO.read(new File("uk.png"));
+        BufferedImage rawImage = ImageIO.read(new File(MAP_PATH));
         mapImage = rawImage.getScaledInstance(350, 433, Image.SCALE_SMOOTH);
 
         // Initialise hash maps and arrays
@@ -54,6 +65,8 @@ public class CityMap extends JPanel
         X_MAX = getXFromLong(LONG_MAX);
         Y_MIN = getYFromLat(LAT_MIN);
         X_MIN = getXFromLong(LONG_MIN);
+
+        setBackground(oceanGray);
     }
 
     public void addFarCity(String city, Point2D.Double point) throws IndexOutOfBoundsException
@@ -148,9 +161,6 @@ public class CityMap extends JPanel
         return (Y_MAX - getYFromLat(latitude)) / (Y_MAX - Y_MIN);
     }
 
-
-
-
     @Override
     protected void paintComponent(Graphics g)
     {
@@ -160,22 +170,22 @@ public class CityMap extends JPanel
         // Draw routes
         for (Line2D.Double route : routes)
         {
-            g.setColor(Color.gray);
+            g.setColor(pastGray);
             g.drawLine((int)(route.x1 * mapImage.getWidth(null)), (int)(route.y1 * mapImage.getHeight(null)),
                     (int)(route.x2 * mapImage.getWidth(null)), (int)(route.y2 * mapImage.getHeight(null)));
         }
 
         // Draw cities
-        g.setColor(Color.red);
+        g.setColor(wrongRed);
         drawPoints(g, farCities);
 
-        g.setColor(Color.black);
+        g.setColor(pastGray);
         drawPoints(g, mapCities);
 
         // Draw highlighted city
         if (highlightedCity != null)
         {
-            g.setColor(Color.gray);
+            g.setColor(lightGray);
             g.fillOval((int) (mapCities.get(highlightedCity).x * mapImage.getWidth(null) - POINT_SIZE / 2 ),
                     (int) (mapCities.get(highlightedCity).y * mapImage.getHeight(null) - POINT_SIZE / 2),
                     POINT_SIZE, POINT_SIZE);
@@ -183,7 +193,7 @@ public class CityMap extends JPanel
             // Draw travel radius if highlighted city exists
             if (travelRadius > 0)
             {
-                g.setColor(Color.gray);
+                g.setColor(Color.lightGray);
                 g.drawOval((int) (mapCities.get(highlightedCity).x * mapImage.getWidth(null) - travelRadius),
                         (int) (mapCities.get(highlightedCity).y * mapImage.getHeight(null) - travelRadius),
                         travelRadius * 2, travelRadius * 2);

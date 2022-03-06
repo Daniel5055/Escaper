@@ -38,6 +38,7 @@ public class EscaperEngine implements ActionListener
 
         // Initialise content pane
         JPanel content = new JPanel();
+        content.setBackground(CityMap.oceanGray);
         content.setBorder(new EmptyBorder(10, 10, 10, 10));
         content.setLayout(new GridBagLayout());
         frame.setContentPane(content);
@@ -57,11 +58,15 @@ public class EscaperEngine implements ActionListener
         // Initialise cityLog
         cityLog = new JTextArea(20, 20);
         JScrollPane pane = new JScrollPane(cityLog);
+        pane.setBorder(null);
         cityLog.setEditable(false);
+        cityLog.setBackground(CityMap.pastGray);
 
         // Initialise inputBox
         inputBox = new JTextField(20);
+        inputBox.setBackground(CityMap.pastGray);
         inputBox.addActionListener(this);
+        inputBox.setBorder(null);
 
         // Create layout constraints and add components to frame
         GridBagConstraints c = new GridBagConstraints();
@@ -72,6 +77,7 @@ public class EscaperEngine implements ActionListener
         c.weightx = 1;
         c.weighty = 1;
         c.gridheight=2;
+        c.insets = new Insets(0, 0, 0, 10);
         frame.add(cityMap, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -87,8 +93,8 @@ public class EscaperEngine implements ActionListener
         frame.add(inputBox, c);
 
         // Show frame
-        frame.setSize(580, 580);
-        frame.setResizable(false);
+        frame.setMinimumSize(new Dimension(590, 490));
+        frame.setResizable(true);
         frame.setVisible(true);
     }
 
