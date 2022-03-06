@@ -80,6 +80,7 @@ public class EscaperState extends State implements ActionListener
                 {
                     cityEngine.addCountryConstraint(country);
                 }
+                endCity = cityEngine.getRandomCity();
             }
 
             cityMap = new CityMap(region);
@@ -344,8 +345,6 @@ public class EscaperState extends State implements ActionListener
             public void actionPerformed(ActionEvent e)
             {
                 region = "Europe";
-                startCity = "London";
-                endCity = "Istanbul";
             }
         });
 

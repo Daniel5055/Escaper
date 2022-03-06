@@ -26,7 +26,7 @@ public class CityEngine
             }
             catch (SQLException e)
             {
-                  System.out.println("bad");
+                  System.out.println("Error with SQL");
             }
       }
 

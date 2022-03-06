@@ -120,7 +120,6 @@ public class CityMap extends JPanel
     public void addCity(String city, double longitude, double latitude) throws IndexOutOfBoundsException
     {
         // if inbounds of map
-        System.out.println(latitude + " " + longitude);
         if (longitude >= LONG_MIN && longitude <= LONG_MAX && latitude >= LAT_MIN && latitude <= LAT_MAX)
         {
             // Convert to mercator web friendly
