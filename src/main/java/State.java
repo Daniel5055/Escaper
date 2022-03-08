@@ -1,3 +1,4 @@
+package main.java;
 
 // Potential for more states to this game
 public abstract class State

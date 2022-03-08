@@ -1,14 +1,18 @@
+package main.java;
+
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class EscaperState extends State implements ActionListener
 {
@@ -91,6 +95,10 @@ public class EscaperState extends State implements ActionListener
 
         }
         catch (IOException e)
+        {
+            System.out.println(e.getStackTrace());
+        }
+        catch (URISyntaxException e)
         {
             System.out.println(e.getStackTrace());
         }

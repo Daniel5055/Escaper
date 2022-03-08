@@ -2,9 +2,5 @@
 /shelf/
 /.idea/workspace.xml
 out/
+.idea/
 *.class
-*.jar
-sqlite3.exe
-csv/
-*.png
-*.zip

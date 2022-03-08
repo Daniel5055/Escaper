@@ -1,6 +1,9 @@
+package main.java;
+
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class EscaperTheme
 {
@@ -19,16 +22,12 @@ public class EscaperTheme
     {
         try
         {
-            Font baseFont = Font.createFont(Font.TRUETYPE_FONT, new File("Hubballi-Regular.ttf"));
+            Font baseFont = Font.createFont(Font.TRUETYPE_FONT, new File(EscaperTheme.class.getResource("/main/resources/Hubballi-Regular.ttf").toURI()));
             mediumFont = baseFont.deriveFont(Font.PLAIN, 18);
             largeFont = baseFont.deriveFont(Font.PLAIN, 36);
 
         }
-        catch (IOException e)
-        {
-            System.out.println(e.getStackTrace());
-        }
-        catch (FontFormatException e)
+        catch (URISyntaxException | IOException | FontFormatException e )
         {
             System.out.println(e.getStackTrace());
         }
